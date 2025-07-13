@@ -1,0 +1,11 @@
+Django==4.2.20
+channels==4.0.0
+djangorestframework==3.14.0
+channels-redis==4.1.0
+redis==5.0.1 
+daphne    
+
+
+
+
+#  daphne -b 127.0.0.1 -p 8000 RealTimeDocumentSystem.asgi:application    websocket run command  
