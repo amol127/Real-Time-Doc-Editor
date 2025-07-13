@@ -244,7 +244,7 @@
                 document.getElementById('connection-status').classList.add('bg-success');
                 
                 // Add current user to active users when connection is established
-                const currentUserId = {{ user.id }};
+                const currentUserId = parseInt('{{ user.id }}');
                 const currentUsername = '{{ user.username }}';
                 activeUsers.set(currentUserId, currentUsername);
                 updateActiveUsersDisplay();
@@ -315,29 +315,37 @@
             const cursorPosition = getCaretPosition();
             
             // Send edit to WebSocket
-            socket.send(JSON.stringify({
-                type: 'edit',
-                content: content,
-                cursor_position: cursorPosition
-            }));
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    type: 'edit',
+                    content: content,
+                    cursor_position: cursorPosition
+                }));
+            } else {
+                console.warn('WebSocket not open. Edit message not sent.');
+            }
             
             // Handle typing indicator
             if (!isTyping) {
                 isTyping = true;
-                socket.send(JSON.stringify({
-                    type: 'typing_start',
-                    user_id: parseInt('{{ user.id }}'),
-                    username: '{{ user.username }}'
-                }));
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'typing_start',
+                        user_id: parseInt('{{ user.id }}'),
+                        username: '{{ user.username }}'
+                    }));
+                }
             }
             
             clearTimeout(typingTimeout);
             typingTimeout = setTimeout(() => {
                 isTyping = false;
-                socket.send(JSON.stringify({
-                    type: 'typing_stop',
-                    user_id: parseInt('{{ user.id }}')
-                }));
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'typing_stop',
+                        user_id: parseInt('{{ user.id }}')
+                    }));
+                }
             }, 1000);
             
             // Request AI suggestions periodically
@@ -349,19 +357,23 @@
         // Handle cursor movement
         document.getElementById('editor').addEventListener('keyup', function(e) {
             const cursorPosition = getCaretPosition();
-            socket.send(JSON.stringify({
-                type: 'cursor_move',
-                cursor_position: cursorPosition
-            }));
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    type: 'cursor_move',
+                    cursor_position: cursorPosition
+                }));
+            }
         });
         
         // Handle mouse clicks for cursor position
         document.getElementById('editor').addEventListener('click', function(e) {
             const cursorPosition = getCaretPosition();
-            socket.send(JSON.stringify({
-                type: 'cursor_move',
-                cursor_position: cursorPosition
-            }));
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    type: 'cursor_move',
+                    cursor_position: cursorPosition
+                }));
+            }
         });
         
         // Get caret position
@@ -522,10 +534,14 @@
         
         // Request AI suggestions
         function requestAISuggestions(text) {
-            socket.send(JSON.stringify({
-                type: 'ai_suggestion_request',
-                text: text
-            }));
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    type: 'ai_suggestion_request',
+                    text: text
+                }));
+            } else {
+                console.warn('WebSocket not open. AI suggestion request not sent.');
+            }
         }
         
         // Show AI suggestion
