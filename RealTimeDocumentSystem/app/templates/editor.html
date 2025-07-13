@@ -274,7 +274,8 @@
         function handleWebSocketMessage(data) {
             switch(data.type) {
                 case 'edit':
-                    if (data.user_id !== {{ user.id }}) {
+                    // Only update if the change is from another user and content is different
+                    if (data.user_id !== parseInt('{{ user.id }}') && document.getElementById('editor').innerHTML !== data.content) {
                         updateEditorContent(data.content);
                     }
                     break;
@@ -285,7 +286,7 @@
                     removeActiveUser(data.user_id);
                     break;
                 case 'cursor_move':
-                    if (data.user_id !== {{ user.id }}) {
+                    if (data.user_id !== parseInt('{{ user.id }}')) {
                         showUserCursor(data.user_id, data.username, data.cursor_position);
                     }
                     break;
@@ -301,6 +302,7 @@
         // Update editor content
         function updateEditorContent(content) {
             const editor = document.getElementById('editor');
+            if (editor.innerHTML === content) return;
             const currentPosition = getCaretPosition();
             editor.innerHTML = content;
             setCaretPosition(currentPosition);
@@ -323,7 +325,7 @@
                 isTyping = true;
                 socket.send(JSON.stringify({
                     type: 'typing_start',
-                    user_id: {{ user.id }},
+                    user_id: parseInt('{{ user.id }}'),
                     username: '{{ user.username }}'
                 }));
             }
@@ -333,7 +335,7 @@
                 isTyping = false;
                 socket.send(JSON.stringify({
                     type: 'typing_stop',
-                    user_id: {{ user.id }}
+                    user_id: parseInt('{{ user.id }}')
                 }));
             }, 1000);
             
@@ -700,7 +702,7 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Add current user to active users immediately
-            const currentUserId = {{ user.id }};
+            const currentUserId = parseInt('{{ user.id }}');
             const currentUsername = '{{ user.username }}';
             activeUsers.set(currentUserId, currentUsername);
             
