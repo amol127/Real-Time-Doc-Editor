@@ -23,4 +23,5 @@ urlpatterns = [
     path('api/document/<int:doc_id>/add-collaborator/', views.add_collaborator, name='add_collaborator'),
     path('api/document/<int:doc_id>/remove-collaborator/', views.remove_collaborator, name='remove_collaborator'),
     path('api/document/<int:doc_id>/save-version/', views.save_version, name='save_version'),
+    path('api/users/', views.get_users, name='get_users'),
 ]

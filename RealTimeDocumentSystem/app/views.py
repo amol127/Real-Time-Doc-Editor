@@ -142,6 +142,16 @@ def add_collaborator(request, doc_id):
     
     return JsonResponse({'success': False, 'error': 'Invalid request'})
 
+@login_required
+def get_users(request):
+    """Get all users except the current user for collaborator selection"""
+    if request.method == 'GET':
+        # Get all users except the current user
+        users = User.objects.exclude(id=request.user.id).values('id', 'username', 'email')
+        return JsonResponse({'users': list(users)})
+    
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 
 @login_required

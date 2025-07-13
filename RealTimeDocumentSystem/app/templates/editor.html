@@ -86,6 +86,22 @@
             border-radius: 4px;
             margin-bottom: 15px;
         }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .dropdown-item:active {
+            background-color: #e9ecef;
+        }
+        
+        #users-dropdown {
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: white;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -172,10 +188,13 @@
                             <label class="form-label">Add Collaborator</label>
                             <div class="input-group">
                                 <input type="text" id="collaborator-username" class="form-control" 
-                                       placeholder="Username">
+                                       placeholder="Click to select user" readonly>
                                 <button class="btn btn-outline-primary" onclick="addCollaborator()">
                                     <i class="fas fa-plus"></i>
                                 </button>
+                            </div>
+                            <div id="users-dropdown" class="dropdown-menu w-100" style="display: none; max-height: 200px; overflow-y: auto;">
+                                <!-- Users will be loaded here -->
                             </div>
                         </div>
                         <div class="form-check">
@@ -614,6 +633,70 @@
             return cookieValue;
         }
         
+        // Load users for collaborator dropdown
+        function loadUsers() {
+            fetch('/api/users/', {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.users) {
+                    populateUsersDropdown(data.users);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading users:', error);
+            });
+        }
+        
+        // Populate users dropdown
+        function populateUsersDropdown(users) {
+            const dropdown = document.getElementById('users-dropdown');
+            dropdown.innerHTML = '';
+            
+            users.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'dropdown-item';
+                userItem.style.cursor = 'pointer';
+                userItem.style.padding = '8px 12px';
+                userItem.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center me-2" 
+                             style="width: 30px; height: 30px;">
+                            <span class="text-white">${user.username.charAt(0).toUpperCase()}</span>
+                        </div>
+                        <div>
+                            <div class="fw-bold">${user.username}</div>
+                            <small class="text-muted">${user.email}</small>
+                        </div>
+                    </div>
+                `;
+                
+                userItem.addEventListener('click', function() {
+                    document.getElementById('collaborator-username').value = user.username;
+                    hideUsersDropdown();
+                });
+                
+                dropdown.appendChild(userItem);
+            });
+        }
+        
+        // Show users dropdown
+        function showUsersDropdown() {
+            const dropdown = document.getElementById('users-dropdown');
+            dropdown.style.display = 'block';
+            loadUsers();
+        }
+        
+        // Hide users dropdown
+        function hideUsersDropdown() {
+            const dropdown = document.getElementById('users-dropdown');
+            dropdown.style.display = 'none';
+        }
+        
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             // Add current user to active users immediately
@@ -623,6 +706,23 @@
             
             initializeWebSocket();
             updateActiveUsersDisplay();
+            
+            // Add event listeners for collaborator dropdown
+            const collaboratorInput = document.getElementById('collaborator-username');
+            if (collaboratorInput) {
+                collaboratorInput.addEventListener('click', function() {
+                    showUsersDropdown();
+                });
+                
+                // Hide dropdown when clicking outside
+                document.addEventListener('click', function(event) {
+                    const dropdown = document.getElementById('users-dropdown');
+                    const input = document.getElementById('collaborator-username');
+                    if (!input.contains(event.target) && !dropdown.contains(event.target)) {
+                        hideUsersDropdown();
+                    }
+                });
+            }
         });
     </script>
 </body>
