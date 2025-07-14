@@ -232,7 +232,7 @@
         function initializeWebSocket() {
             const documentId = document.getElementById('editor').dataset.documentId;
             const wsScheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
-            const wsUrl = `${wsScheme}://${window.location.hostname}/ws/document/${documentId}/`;
+            const wsUrl = `${wsScheme}://${window.location.host}/ws/document/${documentId}/`;
 
             
             socket = new WebSocket(wsUrl);
