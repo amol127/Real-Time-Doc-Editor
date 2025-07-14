@@ -75,7 +75,8 @@ A modern, real-time collaborative document editing platform built with Django, C
 
 6. **Run the development server**
    ```bash
-   python manage.py runserver
+    pip install daphne
+   daphne -b 0.0.0.0 -p 8000 RealTimeDocumentSystem.asgi:application
    ```
 
 7. **Access the application**
