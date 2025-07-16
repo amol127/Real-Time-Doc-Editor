@@ -4,7 +4,8 @@ import logging
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import User
-from .models import Document, DocumentSession
+from .models import Document, DocumentSession, DocumentVersion
+
 import re
 
 logger = logging.getLogger(__name__)
