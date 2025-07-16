@@ -111,9 +111,18 @@ DATABASES = {
 # }
 
 # # Channel Layers Configuration
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer",
+#     },
+# }
+
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("10.92.153.16", 6379)],
+        },
     },
 }
 
