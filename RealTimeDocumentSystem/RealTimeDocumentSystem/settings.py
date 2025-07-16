@@ -28,7 +28,6 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-default-key')
 
 # ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = ['34.93.103.96', 'localhost', '127.0.0.1']
-
 DEBUG = False
 
 
@@ -96,7 +95,7 @@ DATABASES = {
         'NAME': 'django_db',  
         'USER': 'amolsawant', 
         'PASSWORD': os.environ.get('DB_PASSWORD', 'amolsawant@123'),
-        'HOST': '0.0.0.0',
+        'HOST': '34.93.114.125',
         'PORT': '5432',
     }
 }
